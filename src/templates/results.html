@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .main-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        .search-box {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 25px;
+            padding: 1rem;
+            color: white;
+        }
+        .search-box::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .product-card {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .product-card .card-body {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .source-title {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+        }
+        .custom-btn {
+            border-radius: 25px;
+            padding: 0.8rem 2rem;
+            transition: all 0.3s ease;
+        }
+        .custom-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="main-container">
+            <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+                <a class="navbar-brand" href="{{ url_for('home') }}">Price Comparison</a>
+                <div class="ml-auto">
+                    <span class="mr-3">Welcome, {{ current_user.username }}</span>
+                    <a href="{{ url_for('logout') }}" class="btn btn-danger custom-btn">Logout</a>
+                </div>
+            </nav>
+
+            <h2 class="mb-4">Search Results for "{{ query }}"</h2>
+            
+            <form method="GET" action="{{ url_for('search') }}" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="query" class="form-control search-box" 
+                           value="{{ query }}" placeholder="Search products...">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary custom-btn">Search Again</button>
+                    </div>
+                </div>
+            </form>
+
+            {% if not results or not any(results.values()) %}
+                <div class="alert alert-info">No products found. Please try a different search term.</div>
+            {% else %}
+                {% for source, products in results.items() %}
+                    {% if products %}
+                        <div class="mb-5">
+                            <h3 class="source-title">{{ source|title }}</h3>
+                            <div class="row">
+                                {% for product in products %}
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card product-card h-100">
+                                            <img src="{{ product.image }}" class="card-img-top p-3" 
+                                                 alt="{{ product.name }}" 
+                                                 onerror="this.src='https://via.placeholder.com/150'">
+                                            <div class="card-body">
+                                                <h5 class="card-title text-white">{{ product.name }}</h5>
+                                                <p class="card-text">
+                                                    <span class="h4">₹{{ product.price }}</span>
+                                                </p>
+                                                <a href="{{ product.url }}" class="btn btn-primary custom-btn" 
+                                                   target="_blank">View Product</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <a href="{{ url_for('search') }}" class="btn btn-secondary custom-btn">Back to Search</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js"></script>
+</body>
+</html>
